@@ -2,70 +2,51 @@ import React, { useEffect, useState } from "react";
 import MovieList from "./MovieList/MovieList";
 import "./Movie.module.css";
 import AddMovie from "./AddMovie/AddMovie";
+import useHttp from "./hooks/useHttp.js";
 
 function Movie(props) {
     const [movies, setMovies] = useState(null);
-    const [isLoading, setLoading] = useState(false);
-    const [isError, setIsError] = useState(null);
+    const { isLoading, isError, sendRequest } = useHttp();
+
+    const transformMoviesGet = (data) => {
+        let moviesData = [];
+        for (const key in data) {
+            moviesData.unshift({
+                ...data[key],
+                id: key,
+            });
+        }
+        console.log("👙  moviesData: ", moviesData);
+
+        setMovies(moviesData);
+    };
 
     useEffect(() => {
-        getMovieHandler();
-    }, []);
+        sendRequest(
+            {
+                url: "https://react-http-7b01f-default-rtdb.firebaseio.com/movies.json",
+            },
+            transformMoviesGet
+        );
+    }, [sendRequest]);
 
-    async function getMovieHandler(params) {
-        try {
-            setLoading(true);
-            setIsError(null);
-            // const res = await fetch("https://swapi.dev/api/films/");
-            const res = await fetch(
-                "https://react-http-7b01f-default-rtdb.firebaseio.com/movies.json"
-            );
-            if (!res.ok) {
-                throw new Error("Something went wrong!");
-            }
-            const data = await res.json();
-            console.log(data);
-
-            let moviesData = [];
-            for (const key in data) {
-                // console.log(key);
-                // console.log(data[key]);
-                moviesData.unshift({
-                    ...data[key],
-                    id: key,
-                });
-            }
-            // console.log(moviesData);
-            setMovies(moviesData);
-            setLoading(false);
-        } catch (error) {
-            setIsError(error.message);
-        }
+    function updateData(data, dataID) {
+        // console.log("👙  data: ", data);
+        // console.log("👙  dataID: ", dataID);
+        const { name: id } = dataID;
+        data.id = id;
+        setMovies((prev) => {
+            return [data, ...prev];
+        });
     }
 
-    async function addMovieHandler(movie) {
-        const res = await fetch(
-            "https://react-http-7b01f-default-rtdb.firebaseio.com/movies.json",
+    function getData(params) {
+        sendRequest(
             {
-                method: "POST",
-                body: JSON.stringify(movie),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
+                url: "https://react-http-7b01f-default-rtdb.firebaseio.com/movies.json",
+            },
+            transformMoviesGet
         );
-        const data = await res.json();
-        console.log(data);
-
-        const res1 = await fetch(
-            `https://react-http-7b01f-default-rtdb.firebaseio.com/movies/${data.name}.json`
-        );
-        const data1 = await res1.json();
-        data1.id = data.name;
-        // console.log(data1);
-        setMovies((prev) => {
-            return [data1, ...prev];
-        });
     }
 
     let content = "";
@@ -86,10 +67,10 @@ function Movie(props) {
     return (
         <>
             <section>
-                <AddMovie onAddMovie={addMovieHandler} />
+                <AddMovie updateData={updateData} />
             </section>
             <section>
-                <button onClick={getMovieHandler}>Fetch Movies</button>
+                <button onClick={getData}>Fetch Movies</button>
             </section>
             <section>{content}</section>
         </>

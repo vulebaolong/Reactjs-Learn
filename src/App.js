@@ -1,4 +1,5 @@
 import React from "react";
+// import CustomHooks from "./CustomHooks/CustomHooks";
 import Movie from "./Movie/Movie";
 // import Expense from "./Expense/Expense.js";
 // import User from "./User/User.js";
@@ -9,6 +10,7 @@ function App() {
     return (
         <div className="App">
             <Movie />
+            {/* <CustomHooks /> */}
         </div>
     );
 }
