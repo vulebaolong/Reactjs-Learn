@@ -1,6 +1,7 @@
 import React from "react";
+import FormValid from "./FormValid/FormValid";
 // import CustomHooks from "./CustomHooks/CustomHooks";
-import Movie from "./Movie/Movie";
+// import Movie from "./Movie/Movie";
 // import Expense from "./Expense/Expense.js";
 // import User from "./User/User.js";
 // import Login from "./Login/Login.js";
@@ -9,8 +10,7 @@ import Movie from "./Movie/Movie";
 function App() {
     return (
         <div className="App">
-            <Movie />
-            {/* <CustomHooks /> */}
+            <FormValid />
         </div>
     );
 }
